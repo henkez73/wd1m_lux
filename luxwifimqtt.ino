@@ -3,10 +3,10 @@
 #include <PubSubClient.h>
 #include <BH1750.h>
 
-#define wifi_ssid "your_wifi_ssid"
-#define wifi_password "your_wifi_pwd"
+#define wifi_ssid "your_ssid"
+#define wifi_password "your_wifi_passwd"
 
-#define mqtt_server "your_mqtt_server"
+#define mqtt_server "mqtt_server_ip"
 #define mqtt_user "your_username"
 #define mqtt_password "your_password"
 
@@ -16,14 +16,6 @@ BH1750 lightMeter;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-
-void setup() {
-  Serial.begin(115200);
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  lightMeter.begin();
-  Serial.println("Running...");
-  }
 
 void setup_wifi() {
   delay(10);
@@ -44,6 +36,18 @@ void setup_wifi() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 }
+
+void setup() {
+  // Initialize WEMOS D1 mini
+  // D1 IO, SCL GPIO5
+  // D2 IO, SDA GPIO4
+  Wire.begin(4,5); //sda_pin 4 ,scl_pin 5
+  Serial.begin(115200);
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  lightMeter.begin();
+  Serial.println("Running...");
+  }
 
 void reconnect() {
   // Loop until we're reconnected
@@ -69,12 +73,11 @@ void loop() {
     reconnect();
   }
   client.loop();
-  
+
   uint16_t lux = lightMeter.readLightLevel();
-  Serial.print("Light: ");
+  Serial.print("Lux: ");
   Serial.println(String(lux).c_str());
-  // Serial.print(lux);
-  // Serial.println(" lx");
-  delay(10000);
   client.publish(lux_topic, String(lux).c_str(), true);
+  delay(60000);
 }
+
