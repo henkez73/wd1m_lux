@@ -24,6 +24,8 @@ void setup_wifi() {
   Serial.print("Connecting to ");
   Serial.println(wifi_ssid);
 
+  WiFi.mode(WIFI_STA);
+  WiFi.hostname("your_hostname");
   WiFi.begin(wifi_ssid, wifi_password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -80,4 +82,3 @@ void loop() {
   client.publish(lux_topic, String(lux).c_str(), true);
   delay(60000);
 }
-
